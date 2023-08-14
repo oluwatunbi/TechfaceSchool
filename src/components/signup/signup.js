@@ -5,6 +5,7 @@ import Button from "react-bootstrap/Button";
 import { useState } from "react";
 import Modal from "react-bootstrap/Modal";
 import { auth } from "../../firebase.js";
+import { firestores } from "../../firebase.js";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import "./signup.css";
 
@@ -17,24 +18,70 @@ const Register = ({ handleClose }) => {
     confirmPassword: "",
   });
 
+  const createUserDocuments = async (userAuth) => {
+    if (!userAuth) return;
+
+    const userRef = firestores.doc(`user/${userAuth.uid}`);
+
+    const snapShot = await userRef.get();
+
+    if (!snapShot.exists) {
+      const createAt = new Date();
+
+      try {
+        await userRef.set({
+          firstname,
+          lastname,
+          email,
+          password,
+          createAt,
+        });
+      } catch (error) {
+        console.log("Error creating user", error.message);
+      }
+    }
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
-    // if (password !== confirmPassword) {
-    //   alert("Password don't match");
-    //   return;
-    // }
+    if (password !== confirmPassword) {
+      alert("Password don't match");
+      return;
+    }
+    if (
+      firstname === "" ||
+      lastname === "" ||
+      email === "" ||
+      password === "" ||
+      confirmPassword === ""
+    ) {
+      alert("fill the input fields");
+      return;
+    }
+
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
-        formData.email,
-        formData.password
+        email,
+        password
       );
+      const userAuth = userCredential.user;
+      await createUserDocuments(userAuth);
 
-      const user = userCredential.user;
-      console.log("Usercraeted:", user);
+      console.log("Usercraeted:", userAuth);
     } catch (error) {
       console.log(error);
     }
+
+    setFormData({
+      firstname: "",
+      Lastname: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    });
+
+    handleClose();
   };
 
   const handleInputChange = (event) => {
