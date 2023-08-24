@@ -6,7 +6,8 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Register from "../../components/signup/signup.js";
 import { auth } from "../../firebase.js";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 import "./login.css";
 import { useState, useRef } from "react";
 
@@ -26,7 +27,7 @@ const Login = () => {
   const handlePasswordChange = (event) => {
     setPassword(event.target.value);
   };
-
+  const navigate = useNavigate();
   const formRef = useRef(null); // create a ref for the form element
 
   const handleSubmit = async (event) => {
@@ -35,7 +36,8 @@ const Login = () => {
       alert("Enter email and password");
     } else {
       try {
-        await auth.signInWithEmailAndPassword(email, password);
+        await signInWithEmailAndPassword(auth, email, password);
+        navigate("/dashboard");
         setEmail("");
         setPassword("");
         console.log(formRef.current);
@@ -51,55 +53,58 @@ const Login = () => {
       {showRegistermodal && (
         <Register handleClose={() => setShowRegistermodal(false)} />
       )}
-      <Container>
+      <Container fluid className="sample">
         <Row className="login-frame">
-          <Col md="6"></Col>
-          <Col className="mb-2" md="6">
-            <h2> LOG IN</h2>
-            <Form ref={formRef}>
-              <Form.Group className="mb-3" controlId="formBasicEmail">
-                <Form.Label>Email address</Form.Label>
-                <Form.Control
-                  type="email"
-                  placeholder="Enter email"
-                  value={email}
-                  ref={formRef}
-                  onChange={handleEmailChange}
-                />
-                <Form.Text className="text-muted">
-                  We'll never share your email with anyone else.
-                </Form.Text>
-              </Form.Group>
+          <Col md="4"></Col>
+          <Col className=" logboard" md="8">
+            <div className="logfit">
+              {" "}
+              <h2> LOG IN</h2>
+              <Form ref={formRef}>
+                <Form.Group className="mb-3" controlId="formBasicEmail">
+                  <Form.Label>Email address</Form.Label>
+                  <Form.Control
+                    type="email"
+                    placeholder="Enter email"
+                    value={email}
+                    ref={formRef}
+                    onChange={handleEmailChange}
+                  />
+                  <Form.Text className="text-muted">
+                    We'll never share your email with anyone else.
+                  </Form.Text>
+                </Form.Group>
 
-              <Form.Group className="mb-3" controlId="formBasicPassword">
-                <Form.Label>Password</Form.Label>
-                <Form.Control
-                  type="password"
-                  placeholder="Password"
-                  value={password}
-                  ref={formRef}
-                  onChange={handlePasswordChange}
-                />
-              </Form.Group>
-              <Form.Group className="mb-3" controlId="formBasicCheckbox">
-                <Form.Check type="checkbox" label="Check me out" />
-              </Form.Group>
-              <Button
-                variant="primary"
-                type="button"
-                onClick={handleSubmit}
-                className="m-3"
-              >
-                Sign in
-              </Button>
-              <Button
-                variant="primary"
-                type="submit"
-                onClick={handleShowRegistermodal}
-              >
-                Sign Up
-              </Button>
-            </Form>
+                <Form.Group className="mb-3" controlId="formBasicPassword">
+                  <Form.Label>Password</Form.Label>
+                  <Form.Control
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    ref={formRef}
+                    onChange={handlePasswordChange}
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3" controlId="formBasicCheckbox">
+                  <Form.Check type="checkbox" label="Check me out" />
+                </Form.Group>
+                <Button
+                  variant="primary"
+                  type="button"
+                  onClick={handleSubmit}
+                  className="m-3"
+                >
+                  Sign in
+                </Button>
+                <Button
+                  variant="primary"
+                  type="submit"
+                  onClick={handleShowRegistermodal}
+                >
+                  Sign Up
+                </Button>
+              </Form>
+            </div>
           </Col>
         </Row>
       </Container>
